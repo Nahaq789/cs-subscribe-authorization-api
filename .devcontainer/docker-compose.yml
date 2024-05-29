@@ -1,0 +1,9 @@
+services:
+  cs-subscribe-user-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../:/app/authorization
+    tty: true
+    working_dir: /app/authorization
