@@ -1,5 +1,5 @@
 services:
-  cs-subscribe-user-api-dev:
+  cs-subscribe-authorization-api-dev:
     build:
       context: .
       dockerfile: Dockerfile
@@ -7,3 +7,4 @@ services:
       - ../:/app/authorization
     tty: true
     working_dir: /app/authorization
+  
