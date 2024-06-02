@@ -1,7 +1,7 @@
 using Authorization.API.domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Authorization.API.infrastructure;
+namespace Authorization.API.infrastructure.repositroy;
 
 public class UserAuthRepository : IUserAuthRepository
 {
