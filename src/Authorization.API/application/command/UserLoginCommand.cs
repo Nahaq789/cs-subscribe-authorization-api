@@ -1,10 +1,11 @@
 using System.Runtime.Serialization;
+using Authorization.API.application.dto;
 using MediatR;
 
 namespace Authorization.API.application.command;
 
 [DataContract]
-public class UserLoginCommand : IRequest<string>
+public class UserLoginCommand : IRequest<LoginResult>
 {
     [DataMember]
     public string Email { get; private set; }

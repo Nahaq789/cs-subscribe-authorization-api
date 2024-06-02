@@ -1,11 +1,11 @@
 using Authorization.API.application.crypto;
-using Authorization.API.application.exceptions;
-using Authorization.API.infrastructure;
+using Authorization.API.application.dto;
+using Authorization.API.infrastructure.repository;
 using MediatR;
 
 namespace Authorization.API.application.command;
 
-public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, string>
+public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginResult>
 {
     private readonly IUserAuthRepository _userAuthRepository;
 
@@ -20,14 +20,23 @@ public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, string>
     /// </summary>
     /// <param name="email">ユーザーログインコマンド</param>
     /// <param name="password">キャンセレーショントークン</param>
-    public async Task<string> Handle(UserLoginCommand command, CancellationToken cancellationToken)
+    public async Task<LoginResult> Handle(UserLoginCommand command, CancellationToken cancellationToken)
     {
-        var decryptPassword = CryptoPassword.Encrypto(command.Password);
-        var target = await _userAuthRepository.GetByEmailAndPass(command.Email, command.Password);
+        var salt = CryptoPassword.SaltPassword();
+        var hashPassword = CryptoPassword.HashPasswordWithStretching(command.Password, salt);
+        var target = await _userAuthRepository.GetByEmailAndPass(command.Email, hashPassword);
         if (target == null)
         {
-            return "メールアドレスまたはパスワードが間違っています。";
+            return new LoginResult
+            {
+                Success = false,
+                ErrorMessage = "ログイン情報が無効です。"
+            };
         }
-        return "ログインに成功しました。";
+        return new LoginResult
+        {
+            Success = true,
+            Token = ""
+        };
     }
 }
