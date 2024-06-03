@@ -1,7 +1,8 @@
 using Authorization.API.domain;
+using Authorization.API.infrastructure.repository;
 using Microsoft.EntityFrameworkCore;
 
-namespace Authorization.API.infrastructure.repositroy;
+namespace Authorization.API.infrastructure.repository;
 
 public class UserAuthRepository : IUserAuthRepository
 {
@@ -30,4 +31,14 @@ public class UserAuthRepository : IUserAuthRepository
 #pragma warning restore CS8603 // Possible null reference return.
     }
 
+    public async Task<UserAuth> GetByEmail(string email)
+    {
+        var result = await _context.UserAuth.FromSql(
+            $"SELECT Email, Password FROM User WHERE Email = {email}"
+        ).FirstOrDefaultAsync();
+
+#pragma warning disable CS8603 // Possible null reference return.
+        return result;
+#pragma warning restore CS8603 // Possible null reference return.
+    }
 }
