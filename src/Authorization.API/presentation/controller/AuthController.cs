@@ -19,6 +19,12 @@ public class AuthController : Controller
         this._logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <summary>
+    /// Loginエンドポイント
+    /// ユーザーログインコマンドハンドラーを呼び出します。
+    /// </summary>
+    ///<param name="command">ユーザーログインコマンド</param>
+    ///<param name="requestId">リクエストID</param>
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -40,5 +46,21 @@ public class AuthController : Controller
             return TypedResults.Problem(detail: commandResult.ErrorMessage, statusCode: 401);
         }
         return TypedResults.Ok(commandResult.Token);
+    }
+
+    /// <summary>
+    /// Logoutエンドポイント
+    /// ユーザーログアウトコマンドハンドラーを呼び出します。
+    /// </summary>
+    ///<param name="command">ユーザーログアウトコマンド</param>
+    ///<param name="requestId">リクエストID</param>
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<Results<Ok<string>, BadRequest<string>, ProblemHttpResult>> Logout(
+        [FromBody] UserLogoutCommand command, [FromHeader(Name = "x-requestId")] Guid requestId
+    )
+    {
+        return TypedResults.Ok("string");
     }
 }
