@@ -1,4 +1,6 @@
+using Authorization.API.application.service;
 using Authorization.API.infrastructure;
+using Authorization.API.infrastructure.repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace User.Authentication.extensions;
@@ -26,6 +28,9 @@ internal static class Extensions
         {
             cfg.RegisterServicesFromAssemblyContaining(typeof(Program));
         });
+
+        builder.Services.AddTransient<ICryptoPasswordService, CryptoPasswordService>();
+        builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
 
         builder.Services.AddTransient<IUserAuthRepository, UserAuthRepository>();
     }
