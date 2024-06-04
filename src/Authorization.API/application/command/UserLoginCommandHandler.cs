@@ -1,12 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using Authorization.API.application.dto;
 using Authorization.API.application.service;
 using Authorization.API.infrastructure.repository;
 using MediatR;
-using Microsoft.IdentityModel.Tokens;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Authorization.API.application.command;
 
@@ -15,17 +12,20 @@ public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginRe
     private readonly IUserAuthRepository _userAuthRepository;
     private readonly ICryptoPasswordService _cryptoPasswordService;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly IRefreshTokenService _refreshTokenService;
 
     /// <param name="userAuthRepository">ユーザーオースリポジトリ</param>
     /// <param name="configuration">コンフィグ</param>
     public UserLoginCommandHandler(
         IUserAuthRepository userAuthRepository,
         ICryptoPasswordService cryptoPasswordService,
-        IJwtTokenService jwtTokenService)
+        IJwtTokenService jwtTokenService,
+        IRefreshTokenService refreshTokenService)
     {
         this._userAuthRepository = userAuthRepository ?? throw new ArgumentNullException(nameof(userAuthRepository));
         this._cryptoPasswordService = cryptoPasswordService ?? throw new ArgumentNullException(nameof(cryptoPasswordService));
         this._jwtTokenService = jwtTokenService ?? throw new ArgumentNullException(nameof(jwtTokenService));
+        this._refreshTokenService = refreshTokenService ?? throw new ArgumentNullException(nameof(refreshTokenService));
     }
 
     /// <summary>
@@ -35,6 +35,7 @@ public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginRe
     /// <param name="password">キャンセレーショントークン</param>
     public async Task<LoginResult> Handle(UserLoginCommand command, CancellationToken cancellationToken)
     {
+        // メールアドレスのみで取得
         var user = await _userAuthRepository.GetByEmail(command.Email);
         if (user == null)
         {
@@ -45,6 +46,7 @@ public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginRe
             };
         }
 
+        // メールアドレスとハッシュ化されたパスワードで取得
         var hashPassword = _cryptoPasswordService.HashPassword(command.Password, user.Salt);
         var target = await _userAuthRepository.GetByEmailAndPass(command.Email, hashPassword);
         if (target == null)
@@ -55,18 +57,16 @@ public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginRe
                 ErrorMessage = "ログイン情報が無効です。"
             };
         }
+        var token = _jwtTokenService.GenerateNewToken(command.Email);
 
-        var claims = new[]
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, command.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Exp, DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds().ToString())
-        };
-        var token = _jwtTokenService.GenerateNewToken(claims, DateTime.Now.AddMinutes(30));
+        var refreshToken = _refreshTokenService.GenerateRefreshToken();
+        // Redisにリフレッシュトークンを保存する
+        await _refreshTokenService.AddRefreshToken(target.UserId.ToString(), refreshToken, DateTime.Now.AddDays(7));
         return new LoginResult
         {
             Success = true,
-            Token = new JwtSecurityTokenHandler().WriteToken(token)
+            Token = new JwtSecurityTokenHandler().WriteToken(token),
+            RefreshToken = refreshToken,
         };
     }
 }
