@@ -15,8 +15,14 @@ public class JwtTokenService : IJwtTokenService
         this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
-    public JwtSecurityToken GenerateNewToken(IEnumerable<Claim> claims, DateTime expires)
+    public JwtSecurityToken GenerateNewToken(string email)
     {
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Exp, DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds().ToString())
+        };
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("Jwt_Key") ?? string.Empty));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -24,7 +30,7 @@ public class JwtTokenService : IJwtTokenService
             issuer: _configuration.GetValue<string>("Jwt:Issuer"),
             audience: _configuration.GetValue<string>("Jwt:Audience"),
             claims: claims,
-            expires: expires,
+            expires: DateTime.Now.AddMinutes(30),
             signingCredentials: credentials
         );
 

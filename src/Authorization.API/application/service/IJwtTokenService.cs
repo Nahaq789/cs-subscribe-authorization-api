@@ -4,5 +4,5 @@ namespace Authorization.API.application.service;
 
 public interface IJwtTokenService
 {
-    JwtSecurityToken GenerateNewToken(IEnumerable<Claim> claims, DateTime expires);
+    JwtSecurityToken GenerateNewToken(string email);
 }
