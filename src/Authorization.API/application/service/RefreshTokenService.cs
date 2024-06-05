@@ -31,9 +31,9 @@ public class RefreshTokenService : IRefreshTokenService
         await _cache.SetStringAsync(userId, serializedToken);
     }
 
-    public async Task RemoveRefreshToken(string refreshToken, CancellationToken cancellationToken)
+    public async Task RemoveRefreshToken(string userId, CancellationToken cancellationToken)
     {
-        await _cache.RemoveAsync(refreshToken, cancellationToken);
+        await _cache.RemoveAsync(userId, cancellationToken);
     }
 
 }
