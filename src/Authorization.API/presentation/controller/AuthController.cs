@@ -57,10 +57,19 @@ public class AuthController : Controller
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<Results<Ok<string>, BadRequest<string>, ProblemHttpResult>> Logout(
+    public async Task<Results<Ok, BadRequest<string>, ProblemHttpResult>> Logout(
         [FromBody] UserLogoutCommand command, [FromHeader(Name = "x-requestId")] Guid requestId
     )
     {
-        return TypedResults.Ok("string");
+        if (requestId == Guid.Empty)
+        {
+            return TypedResults.BadRequest("RequestID is Empty");
+        }
+        var requestCommand = new IdentifiedCommand<UserLogoutCommand, string>(command, requestId);
+
+        _logger.LogInformation("Sending command: {CommandName})", requestCommand.GetType());
+
+        await _mediator.Send(requestCommand);
+        return TypedResults.Ok();
     }
 }
