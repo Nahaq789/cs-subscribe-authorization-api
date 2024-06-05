@@ -16,10 +16,10 @@ public class RefreshTokenService : IRefreshTokenService
     {
         return Guid.NewGuid().ToString();
     }
-    public async Task<string> ValidateRefreshToken(string refreshToken, CancellationToken cancellationToken)
+    public async Task<string> ValidateRefreshToken(string userId, CancellationToken cancellationToken)
     {
 #pragma warning disable CS8603 // Possible null reference return.
-        return await _cache.GetStringAsync(refreshToken, cancellationToken);
+        return await _cache.GetStringAsync(userId, cancellationToken);
 #pragma warning restore CS8603 // Possible null reference return.
     }
 

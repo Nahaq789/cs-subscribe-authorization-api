@@ -31,8 +31,7 @@ public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginRe
     /// <summary>
     /// コマンドハンドラーです。暗号化されたトークンを返します。
     /// </summary>
-    /// <param name="email">ユーザーログインコマンド</param>
-    /// <param name="password">キャンセレーショントークン</param>
+    /// <param name="command">ユーザーログインコマンド</param>
     public async Task<LoginResult> Handle(UserLoginCommand command, CancellationToken cancellationToken)
     {
         // メールアドレスのみで取得
