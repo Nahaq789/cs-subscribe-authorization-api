@@ -8,3 +8,8 @@ services:
     tty: true
     working_dir: /app/authorization
   
+  cs-subscribe-redis: 
+    image: redis
+    ports:
+      - 6379:6379
+  
