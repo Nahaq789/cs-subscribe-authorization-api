@@ -16,11 +16,16 @@ public class RefreshTokenService : IRefreshTokenService
     {
         return Guid.NewGuid().ToString();
     }
-    public async Task<string> ValidateRefreshToken(string userId, CancellationToken cancellationToken)
+    public async Task<bool> ValidateRefreshToken(string userId, string refreshToken, CancellationToken cancellationToken)
     {
-#pragma warning disable CS8603 // Possible null reference return.
-        return await _cache.GetStringAsync(userId, cancellationToken);
-#pragma warning restore CS8603 // Possible null reference return.
+        var token = await _cache.GetStringAsync(userId, cancellationToken);
+        if (string.IsNullOrEmpty(token)) return false;
+
+        var storedToken = JsonSerializer.Deserialize<RefreshToken>(token);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        return storedToken.token == refreshToken && storedToken.expiration == DateTime.UtcNow;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
     }
 
     public async Task AddRefreshToken(string userId, string refreshToken, DateTime expiresIn)

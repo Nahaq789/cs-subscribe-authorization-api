@@ -11,10 +11,10 @@ public interface IRefreshTokenService
     string GenerateRefreshToken();
 
     /// <summary>
-    /// Redisからリフレッシュトークンを取得します。
+    /// Redisからリフレッシュトークンを取得し、検証します。
     /// </summary>
     /// <param name="userId">ユーザーID</param>
-    Task<string> ValidateRefreshToken(string userId, CancellationToken cancellationToken);
+    Task<bool> ValidateRefreshToken(string userId, string refreshToken, CancellationToken cancellationToken);
 
     /// <summary>
     /// リフレッシュトークンをRedisに追加します。
