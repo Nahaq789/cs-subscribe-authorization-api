@@ -12,5 +12,5 @@ public interface IJwtTokenService
     /// ユーザーのメールアドレスを含めてトークンを生成
     /// </summary>
     /// <param name="email">メールアドレス</param>
-    JwtSecurityToken GenerateNewToken(string email);
+    JwtSecurityToken GenerateJwtToken(string email);
 }

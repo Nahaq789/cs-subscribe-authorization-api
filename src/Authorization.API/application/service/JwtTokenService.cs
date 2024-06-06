@@ -15,7 +15,7 @@ public class JwtTokenService : IJwtTokenService
         this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
-    public JwtSecurityToken GenerateNewToken(string email)
+    public JwtSecurityToken GenerateJwtToken(string email)
     {
         var claims = new[]
         {
