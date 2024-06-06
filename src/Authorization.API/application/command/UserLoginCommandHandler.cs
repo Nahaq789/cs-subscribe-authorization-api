@@ -56,7 +56,7 @@ public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginRe
                 ErrorMessage = "ログイン情報が無効です。"
             };
         }
-        var token = _jwtTokenService.GenerateNewToken(command.Email);
+        var token = _jwtTokenService.GenerateJwtToken(command.Email);
 
         var refreshToken = _refreshTokenService.GenerateRefreshToken();
         // Redisにリフレッシュトークンを保存する
