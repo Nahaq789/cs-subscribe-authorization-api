@@ -1,4 +1,5 @@
 using Authorization.API.domain;
+using Authorization.API.domain.dto;
 using Authorization.API.infrastructure.repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,9 +23,14 @@ public class UserAuthRepository : IUserAuthRepository
     /// </summary>
     public async Task<UserAuth> GetByEmailAndPass(string email, string password)
     {
-        var result = await _context.UserAuth.FromSql(
-            $"SELECT Email, Password FROM User WHERE Email = {email} AND Password = {password}"
-        ).FirstOrDefaultAsync();
+        var result = await (from userAggregate in _context.Set<UserAggregate>()
+                            join user in _context.Set<UserEntity>()
+                                on userAggregate.AggregateId equals user.AggregateId
+                            join salt in _context.Set<UserSalt>()
+                                on userAggregate.AggregateId equals salt.AggregateId
+                            where user.Email == email && user.Password == password
+                            select new UserAuth(userAggregate.AggregateId, user.Email, user.Password, salt.Salt))
+                     .FirstOrDefaultAsync();
 
 #pragma warning disable CS8603 // Possible null reference return.
         return result;
@@ -33,9 +39,14 @@ public class UserAuthRepository : IUserAuthRepository
 
     public async Task<UserAuth> GetByEmail(string email)
     {
-        var result = await _context.UserAuth.FromSql(
-            $"SELECT Email, Password FROM User WHERE Email = {email}"
-        ).FirstOrDefaultAsync();
+        var result = await (from userAggregate in _context.Set<UserAggregate>()
+                            join user in _context.Set<UserEntity>()
+                                on userAggregate.AggregateId equals user.AggregateId
+                            join salt in _context.Set<UserSalt>()
+                                on userAggregate.AggregateId equals salt.AggregateId
+                            where user.Email == email
+                            select new UserAuth(userAggregate.AggregateId, user.Email, user.Password, salt.Salt))
+                     .FirstOrDefaultAsync();
 
 #pragma warning disable CS8603 // Possible null reference return.
         return result;

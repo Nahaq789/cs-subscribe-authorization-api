@@ -1,4 +1,4 @@
-using Authorization.API.domain;
+using Authorization.API.domain.dto;
 
 namespace Authorization.API.infrastructure.repository;
 
