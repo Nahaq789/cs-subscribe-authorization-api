@@ -1,4 +1,4 @@
-namespace Authorization.API.domain;
+namespace Authorization.API.domain.dto;
 
 public class UserAuth
 {

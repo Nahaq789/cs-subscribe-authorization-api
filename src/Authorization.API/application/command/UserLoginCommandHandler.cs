@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Authorization.API.application.dto;
+using Authorization.API.application.model;
 using Authorization.API.application.service;
 using Authorization.API.infrastructure.repository;
 using MediatR;

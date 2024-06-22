@@ -1,4 +1,4 @@
-namespace Authorization.API.application.dto;
+namespace Authorization.API.application.model;
 
 public class LoginResult
 {

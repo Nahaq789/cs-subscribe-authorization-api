@@ -1,5 +1,5 @@
 using System.Runtime.Serialization;
-using Authorization.API.application.dto;
+using Authorization.API.application.model;
 using MediatR;
 
 namespace Authorization.API.application.command;
