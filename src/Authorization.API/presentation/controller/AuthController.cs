@@ -1,5 +1,5 @@
 using Authorization.API.application.command;
-using Authorization.API.application.dto;
+using Authorization.API.application.model;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +28,7 @@ public class AuthController : Controller
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<Results<Ok<string>, BadRequest<string>, ProblemHttpResult>> Login(
+    public async Task<Results<Ok<LoginResult>, BadRequest<string>, ProblemHttpResult>> Login(
         [FromBody] UserLoginCommand command, [FromHeader(Name = "x-requestId")] Guid requestId
     )
     {
@@ -40,12 +40,12 @@ public class AuthController : Controller
 
         _logger.LogInformation("Sending command: {CommandName})", requestCommand.GetType());
 
-        var commandResult = await _mediator.Send(requestCommand);
+        var commandResult = await _mediator.Send(requestCommand.Command);
         if (commandResult.Success == false)
         {
             return TypedResults.Problem(detail: commandResult.ErrorMessage, statusCode: 401);
         }
-        return TypedResults.Ok(commandResult.Token);
+        return TypedResults.Ok(commandResult);
     }
 
     /// <summary>

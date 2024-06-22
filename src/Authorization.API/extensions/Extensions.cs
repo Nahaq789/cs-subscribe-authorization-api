@@ -16,7 +16,7 @@ internal static class Extensions
     public static void SetupDI(this WebApplicationBuilder builder)
     {
         var configure = builder.Configuration;
-        var connectionString = configure.GetConnectionString("ConnectionStrings");
+        var connectionString = configure.GetConnectionString("userdb");
 
         builder.Services.AddDbContext<UserContext>((serviceProvider, option) =>
         {
@@ -29,8 +29,14 @@ internal static class Extensions
             cfg.RegisterServicesFromAssemblyContaining(typeof(Program));
         });
 
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = "host.docker.internal:6379";
+        });
+
         builder.Services.AddTransient<ICryptoPasswordService, CryptoPasswordService>();
         builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
+        builder.Services.AddTransient<IRefreshTokenService, RefreshTokenService>();
 
         builder.Services.AddTransient<IUserAuthRepository, UserAuthRepository>();
     }
