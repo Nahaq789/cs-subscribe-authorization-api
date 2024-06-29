@@ -50,7 +50,9 @@ public class JwtTokenService : IJwtTokenService
             {
                 ValidIssuer = _configuration["Jwt:Issuer"],
                 ValidAudience = _configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(key),
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(_configuration.GetValue<string>("Jwt:Jwt_Key") ?? string.Empty)
+                ),
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
