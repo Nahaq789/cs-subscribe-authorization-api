@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Authorization.API.application.command;
 
-public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginResult>
+public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, AuthResult>
 {
     private readonly IUserAuthRepository _userAuthRepository;
     private readonly ICryptoPasswordService _cryptoPasswordService;
@@ -32,13 +32,13 @@ public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginRe
     /// コマンドハンドラーです。暗号化されたトークンを返します。
     /// </summary>
     /// <param name="command">ユーザーログインコマンド</param>
-    public async Task<LoginResult> Handle(UserLoginCommand command, CancellationToken cancellationToken)
+    public async Task<AuthResult> Handle(UserLoginCommand command, CancellationToken cancellationToken)
     {
         // メールアドレスのみで取得
         var user = await _userAuthRepository.GetByEmail(command.Email);
         if (user == null)
         {
-            return new LoginResult
+            return new AuthResult
             {
                 Success = false,
                 ErrorMessage = "ユーザーが見つかりません。"
@@ -50,7 +50,7 @@ public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginRe
         var target = await _userAuthRepository.GetByEmailAndPass(command.Email, hashPassword);
         if (target == null)
         {
-            return new LoginResult
+            return new AuthResult
             {
                 Success = false,
                 ErrorMessage = "ログイン情報が無効です。"
@@ -61,7 +61,7 @@ public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, LoginRe
         var refreshToken = _refreshTokenService.GenerateRefreshToken();
         // Redisにリフレッシュトークンを保存する
         await _refreshTokenService.AddRefreshToken(target.UserId.ToString(), refreshToken, DateTime.Now.AddDays(7));
-        return new LoginResult
+        return new AuthResult
         {
             Success = true,
             Token = new JwtSecurityTokenHandler().WriteToken(token),

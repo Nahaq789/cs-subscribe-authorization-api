@@ -22,10 +22,8 @@ public class RefreshTokenService : IRefreshTokenService
         if (string.IsNullOrEmpty(token)) return false;
 
         var storedToken = JsonSerializer.Deserialize<RefreshToken>(token);
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-        return storedToken.token == refreshToken && storedToken.expiration == DateTime.UtcNow;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
+        return storedToken?.token == refreshToken && storedToken.expiration == DateTime.UtcNow;
     }
 
     public async Task AddRefreshToken(string userId, string refreshToken, DateTime expiresIn)

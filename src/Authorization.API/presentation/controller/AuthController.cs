@@ -28,7 +28,7 @@ public class AuthController : Controller
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<Results<Ok<LoginResult>, BadRequest<string>, ProblemHttpResult>> Login(
+    public async Task<Results<Ok<AuthResult>, BadRequest<string>, ProblemHttpResult>> Login(
         [FromBody] UserLoginCommand command, [FromHeader(Name = "x-requestId")] Guid requestId
     )
     {
@@ -36,7 +36,7 @@ public class AuthController : Controller
         {
             return TypedResults.BadRequest("Request ID is empty");
         }
-        var requestCommand = new IdentifiedCommand<UserLoginCommand, LoginResult>(command, requestId);
+        var requestCommand = new IdentifiedCommand<UserLoginCommand, AuthResult>(command, requestId);
 
         _logger.LogInformation("Sending command: {CommandName})", requestCommand.GetType());
 

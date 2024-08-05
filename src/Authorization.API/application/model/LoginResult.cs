@@ -1,6 +1,6 @@
 namespace Authorization.API.application.model;
 
-public class LoginResult
+public class AuthResult
 {
     public bool Success { get; set; }
     public string Token { get; set; } = string.Empty;

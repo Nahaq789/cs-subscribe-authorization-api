@@ -5,7 +5,7 @@ using MediatR;
 namespace Authorization.API.application.command;
 
 [DataContract]
-public class UserLoginCommand : IRequest<LoginResult>
+public class UserLoginCommand : IRequest<AuthResult>
 {
     [DataMember]
     public string Email { get; private set; }

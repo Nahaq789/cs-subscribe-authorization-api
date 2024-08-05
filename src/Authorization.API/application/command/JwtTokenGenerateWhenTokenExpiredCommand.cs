@@ -1,9 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
+using Authorization.API.application.model;
 using MediatR;
 
 namespace Authorization.API.application.command;
 
-public class JwtTokenGenerateWhenTokenExpiredCommand : IRequest<JwtSecurityToken>
+public class JwtTokenGenerateWhenTokenExpiredCommand : IRequest<AuthResult>
 {
     public string UserId { get; private set; }
     public string Email { get; private set; }
